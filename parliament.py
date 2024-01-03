@@ -36,4 +36,4 @@ class Parliament:
             ending = f"@{self.president_candidate} и @{self.chancellor_candidate} <b>не были выбраны</b>!"
             symbol = "❌"
 
-        return symbol + "Голосование завершено!\nВ результате " + ending
+        return symbol + " Голосование завершено!\nВ результате " + ending
