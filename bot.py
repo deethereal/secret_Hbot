@@ -79,6 +79,18 @@ async def cmd_new_game(message: Message):
     await message.answer(f"Id вашей игры: `{game_id}`", parse_mode="MarkdownV2")
 
 
+@dp.message(Command("help"))
+async def cmd_help(message: Message):
+    text = """
+How to use?
+1\. Create group chat with your friends in Telegram
+2\. Add @secret\_HBot to your chat
+3\. Send `/new\_game` in chat when you are ready
+4\. Send `/vote @<president-username> @<chancellor-username>` when it is an election time\!
+    """
+    await message.answer(text, parse_mode="MarkdownV2")
+
+
 async def main():
     await dp.start_polling(bot)
 
