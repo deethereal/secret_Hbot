@@ -79,7 +79,7 @@ async def register_vote(callback: CallbackQuery):
             logging.debug(
                 f"Закончилось с {parliament.positive_votes} голосами 'за' и {parliament.negative_votes} 'против'"
             )
-
+            await callback.message.edit_text(callback.message.text)
             await callback.message.answer(parliament.end_voting())
         await callback.answer()
 
