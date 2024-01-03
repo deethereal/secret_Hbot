@@ -68,17 +68,19 @@ async def register_vote(callback: CallbackQuery):
         logging.debug(f"В чате {parliament.chat.id} юзер {callback.from_user.username} нажал на кнопку {action}")
         if action == "yes":
             parliament.positive_votes += 1
-            logging.debug("Количество 'за' увеличилось на 1")
+            logging.debug(f"В чате {parliament.chat.id} количество 'за' увеличилось на 1")
         elif action == "no":
             parliament.negative_votes += 1
-            logging.debug("Количество 'против' увеличилось на 1")
+            logging.debug(f"В чате {parliament.chat.id} количество 'против' увеличилось на 1")
         parliament.voted_users.add(user_id)
         await callback.message.answer(f"{callback.from_user.full_name} проголосовал(а)!")
         if parliament.positive_votes + parliament.negative_votes == parliament.num_voters:
             sleep(random.random() * MAX_SLEEP_DURATION)
-            logging.debug(
-                f"Закончилось с {parliament.positive_votes} голосами 'за' и {parliament.negative_votes} 'против'"
+            end_phrase = (
+                f"В чате {parliament.chat.id} голосование закончилось с "
+                f"{parliament.positive_votes} голосами 'за' и {parliament.negative_votes} 'против'"
             )
+            logging.debug(end_phrase)
             await callback.message.edit_text(callback.message.text)
             await callback.message.answer(parliament.end_voting())
         await callback.answer()
