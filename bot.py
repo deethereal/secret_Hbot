@@ -13,7 +13,7 @@ from parliament import Parliament
 ID2GAME = {}
 MAX_SLEEP_DURATION = 2
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 with open("token.txt") as f:
     token = f.readline()
 bot = Bot(token=token, parse_mode="HTML")
@@ -65,24 +65,32 @@ async def register_vote(callback: CallbackQuery):
         and parliament.is_voting
         and user_id not in parliament.voted_users
     ):
+        logging.debug(f"В чате {parliament.chat.id} юзер {callback.from_user.username} нажал на кнопку {action}")
         if action == "yes":
             parliament.positive_votes += 1
+            logging.debug("Количество 'за' увеличилось на 1")
         elif action == "no":
             parliament.negative_votes += 1
+            logging.debug("Количество 'против' увеличилось на 1")
         parliament.voted_users.add(user_id)
+        await callback.message.answer(f"{callback.from_user.full_name} проголосовал(а)!")
         if parliament.positive_votes + parliament.negative_votes == parliament.num_voters:
             sleep(random.random() * MAX_SLEEP_DURATION)
-            await callback.message.edit_text(parliament.end_voting())
+            logging.debug(
+                f"Закончилось с {parliament.positive_votes} голосами 'за' и {parliament.negative_votes} 'против'"
+            )
+
+            await callback.message.answer(parliament.end_voting())
         await callback.answer()
 
 
 @dp.message(Command("new_game"))
 async def cmd_new_game(message: Message):
-    game_id = uuid.uuid4().hex
+    game_id = uuid.uuid4().hex[:-1]
     num_voters = await bot.get_chat_member_count(message.chat.id) - 2
     ID2GAME[message.chat.id] = Parliament(chat=message.chat, num_voters=num_voters)
     logging.debug(ID2GAME[message.chat.id])
-    await message.answer(f"Id вашей игры: `{game_id}`", parse_mode="MarkdownV2")
+    await message.answer(f"Id игры: `{game_id}`", parse_mode="MarkdownV2")
 
 
 @dp.message(Command("help"))
@@ -91,8 +99,8 @@ async def cmd_help(message: Message):
 Как использовать?
 1\. Создайте групповой чат в Телеграм
 2\. Добавьте в него @secret\_HBot
-3\. Отправьте `/new\_game` в чат, когда все роли разданы
-4. Отправьте `/vote @<president\_username> @<chancellor\_username>` когда пришло время голосования!
+3\. Отправьте `/new\_game` в чат, когда все роли розданы
+4\. Отправьте `/vote @<president\_username> @<chancellor\_username>` когда пришло время голосования\!
 """
     await message.answer(text, parse_mode="MarkdownV2")
 
