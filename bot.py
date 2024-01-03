@@ -59,11 +59,17 @@ async def cmd_vote(message: Message, command: CommandObject):
 async def register_vote(callback: CallbackQuery):
     action = callback.data.split("_")[1]
     parliament: Parliament = ID2GAME[callback.message.chat.id]
-    if callback.from_user.username != parliament.president_candidate and parliament.is_voting:
+    user_id = callback.from_user.id
+    if (
+        callback.from_user.username != parliament.president_candidate
+        and parliament.is_voting
+        and user_id not in parliament.voted_users
+    ):
         if action == "yes":
             parliament.positive_votes += 1
         elif action == "no":
             parliament.negative_votes += 1
+        parliament.voted_users.add(user_id)
         if parliament.positive_votes + parliament.negative_votes == parliament.num_voters:
             sleep(random.random() * MAX_SLEEP_DURATION)
             await callback.message.edit_text(parliament.end_voting())
@@ -82,12 +88,12 @@ async def cmd_new_game(message: Message):
 @dp.message(Command("help"))
 async def cmd_help(message: Message):
     text = """
-How to use?
-1\. Create group chat with your friends in Telegram
-2\. Add @secret\_HBot to your chat
-3\. Send `/new\_game` in chat when you are ready
-4\. Send `/vote @<president-username> @<chancellor-username>` when it is an election time\!
-    """
+Как использовать?
+1\. Создайте групповой чат в Телеграм
+2\. Добавьте в него @secret\_HBot
+3\. Отправьте `/new\_game` в чат, когда все роли разданы
+4. Отправьте `/vote @<president\_username> @<chancellor\_username>` когда пришло время голосования!
+"""
     await message.answer(text, parse_mode="MarkdownV2")
 
 

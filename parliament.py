@@ -14,11 +14,13 @@ class Parliament:
         self.negative_votes = 0
         self.president_candidate = None
         self.chancellor_candidate = None
+        self.voted_users = set()
 
     def start_voting(self, president: str, chancellor: str):
         self.is_voting = True
         self.positive_votes = 0
         self.negative_votes = 0
+        self.voted_users = set()
         self.president_candidate = president
         self.chancellor_candidate = chancellor
 
